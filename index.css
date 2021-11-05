@@ -1,0 +1,13 @@
+.table {
+  border: 1px solid grey;
+  border-collapse: collapse;
+}
+th {
+  border-bottom: 1px solid grey;
+  width: 100px;
+  text-align: start;
+}
+td {
+  border-bottom: 1px solid grey;
+  width: 100px;
+}
