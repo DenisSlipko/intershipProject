@@ -1,4 +1,3 @@
-//import dataJSON from "./data.json";
 const countries = [
   {
     name: "Afghanistan",
@@ -142,14 +141,50 @@ const countries = [
   },
 ];
 
-// let json = JSON.parse(dataJSON);
-// console.log(json);
+const columnsFields = [
+  { nameField: "Name", key: "name", order: null, clicked: false },
+  { nameField: "Iso", key: "iso", order: null, clicked: false },
+  { nameField: "Phone сode", key: "phoneCode", order: null, clicked: false },
+  { nameField: "Currency", key: "currency", order: null, clicked: false },
+  { nameField: "Capital", key: "capital", order: null, clicked: false },
+];
+const headerTableRow = document.querySelector(".table-header-row");
+const tableItem = document.querySelector("#tableItem");
 
-(function () {
-  document.getElementById("tableItem").innerHTML = countries
-    .map(
-      (e) =>
-        `<tr><td class="item-cell">${e.name}</td><td class="item-cell">${e.iso}</td><td class="item-cell">${e.phoneCode}</td><td class="item-cell">${e.currency}</td><td class="item-cell">${e.capital}</td></tr>`
-    )
-    .join("");
-})();
+class Table {
+  constructor() {}
+
+  createHeader() {
+    const fragment = new DocumentFragment();
+    columnsFields.forEach((col) => {
+      const cell = document.createElement("th");
+      cell.classList.add("item-cell");
+      cell.textContent = col.nameField;
+      fragment.appendChild(cell);
+    });
+
+    headerTableRow.appendChild(fragment);
+  }
+
+  createCells() {
+    const fragment = new DocumentFragment();
+    countries.forEach((country) => {
+      const field = document.createElement("tr");
+      field.classList.add("row-field");
+
+      const cells = columnsFields.map((column) => {
+        const cell = document.createElement("td");
+        cell.classList.add("item-cell");
+        cell.textContent = country[column.key];
+
+        return cell;
+      });
+      field.append(...cells);
+      fragment.appendChild(field);
+    });
+    tableItem.appendChild(fragment);
+  }
+}
+const coutrinesTable = new Table();
+coutrinesTable.createHeader();
+coutrinesTable.createCells();
