@@ -1,14 +1,22 @@
 {
-  "name": "intershipproject",
+  "name": "intershiproadmap",
   "version": "1.0.0",
-  "description": "",
+  "description": "intership project",
   "main": "index.js",
-  "dependencies": {},
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \\\"Error: no test specified\\\" && exit 1",
-    "start": "node ./src/index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Denis",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DenisSlipko/intershipProject.git"
+  },
+  "author": "Denis Slipko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DenisSlipko/intershipProject/issues"
+  },
+  "homepage": "https://github.com/DenisSlipko/intershipProject#readme",
+  "devDependencies": {
+    "eslint": "^8.2.0"
+  }
 }
