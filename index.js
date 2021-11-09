@@ -152,7 +152,10 @@ const headerTableRow = document.querySelector(".table-header-row");
 const tableItem = document.querySelector("#tableItem");
 
 class Table {
-  constructor() {}
+  constructor() {
+    this.headerTableRow = headerTableRow;
+    this.tableItem = tableItem;
+  }
 
   createHeader() {
     const fragment = new DocumentFragment();
@@ -185,6 +188,6 @@ class Table {
     tableItem.appendChild(fragment);
   }
 }
-const coutrinesTable = new Table();
+const coutrinesTable = new Table(headerTableRow, tableItem);
 coutrinesTable.createHeader();
 coutrinesTable.createCells();
