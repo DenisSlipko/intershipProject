@@ -1,13 +1,14 @@
 export class Table {
-  columnsConfig = null;
+  countriesTableColumnsConfig = null;
   tableContainer = null;
   tbody = null;
   thead = null;
 
-  constructor(columnsConfig, tableContainer) {
-    this.columnsConfig = columnsConfig;
+  constructor(countriesTableColumnsConfig, tableContainer) {
+    this.countriesTableColumnsConfig = countriesTableColumnsConfig;
     this.tableContainer = tableContainer;
   }
+
   createTable() {
     this.thead = document.createElement("thead");
     this.tableContainer.append(this.thead);
@@ -21,7 +22,7 @@ export class Table {
   createHeader() {
     const tr = document.createElement("tr");
 
-    const cells = this.columnsConfig.map((col) => {
+    const cells = this.countriesTableColumnsConfig.map((col) => {
       const cell = document.createElement("th");
       cell.textContent = col.label;
       return cell;
@@ -30,18 +31,18 @@ export class Table {
     this.thead.append(tr);
   }
 
-  render(countries) {
+  render(data) {
     const fragment = new DocumentFragment();
-    countries.forEach((country) => {
-      const field = document.createElement("tr");
-      const cells = this.columnsConfig.map((column) => {
+    data.forEach((element) => {
+      const rowElement = document.createElement("tr");
+      const cells = this.countriesTableColumnsConfig.map((column) => {
         const cell = document.createElement("td");
-        cell.textContent = country[column.key];
+        cell.textContent = element[column.key];
 
         return cell;
       });
-      field.append(...cells);
-      fragment.appendChild(field);
+      rowElement.append(...cells);
+      fragment.appendChild(rowElement);
     });
 
     this.tbody.appendChild(fragment);

@@ -19,11 +19,5 @@
   "homepage": "https://github.com/DenisSlipko/intershipProject#readme",
   "devDependencies": {
     "eslint": "^8.2.0"
-  },
-  "env": {
-    "node": 1
-  },
-  "rules": {
-    "quotes": [2, "single", { "avoidEscape": true }]
   }
 }
