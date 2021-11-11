@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "intership project",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/DenisSlipko/intershipProject/issues"
   },
-  "homepage": "https://github.com/DenisSlipko/intershipProject#readme"
+  "homepage": "https://github.com/DenisSlipko/intershipProject#readme",
+  "devDependencies": {
+    "eslint": "^8.2.0"
+  }
 }
