@@ -8,6 +8,7 @@ export class Table {
     this.columnsConfig = columnsConfig;
     this.tableContainer = tableContainer;
   }
+
   createTable() {
     this.thead = document.createElement("thead");
     this.tableContainer.append(this.thead);
@@ -30,13 +31,13 @@ export class Table {
     this.thead.append(tr);
   }
 
-  render(countries) {
+  render(data) {
     const fragment = new DocumentFragment();
-    countries.forEach((country) => {
+    data.forEach((element) => {
       const field = document.createElement("tr");
       const cells = this.columnsConfig.map((column) => {
         const cell = document.createElement("td");
-        cell.textContent = country[column.key];
+        cell.textContent = element[column.key];
 
         return cell;
       });
