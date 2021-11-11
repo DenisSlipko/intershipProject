@@ -34,15 +34,15 @@ export class Table {
   render(data) {
     const fragment = new DocumentFragment();
     data.forEach((element) => {
-      const field = document.createElement("tr");
+      const rowElement = document.createElement("tr");
       const cells = this.columnsConfig.map((column) => {
         const cell = document.createElement("td");
         cell.textContent = element[column.key];
 
         return cell;
       });
-      field.append(...cells);
-      fragment.appendChild(field);
+      rowElement.append(...cells);
+      fragment.appendChild(rowElement);
     });
 
     this.tbody.appendChild(fragment);
