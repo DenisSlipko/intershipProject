@@ -1,12 +1,60 @@
 .table {
-  border: 1px solid grey;
-  border-collapse: collapse;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-family: "Roboto";
+}
+.table-header {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+}
+.table-header-row {
+  display: flex;
+  padding: 1em 0.5em;
   width: 100%;
 }
-th {
-  border-bottom: 1px solid grey;
-  text-align: start;
+.table-header__cell {
+  display: flex;
+  flex: 1;
+  border-right: 2px solid #ccc;
+  margin-left: 5px;
+  white-space: nowrap;
 }
-td {
-  border-bottom: 1px solid grey;
+.btn-container {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  padding: 0 0.5em;
+}
+.material-icons {
+  display: none !important;
+  align-self: center;
+  cursor: pointer;
+  color: #ccc;
+  right: 0;
+}
+.material-icons:hover {
+  background: rgb(245, 245, 245);
+  border-radius: 50%;
+}
+.table-header__cell:hover .material-icons {
+  font-size: 19px;
+  display: block !important;
+}
+.table-row {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  padding: 0.5em;
+}
+.table-row:hover {
+  background: rgb(245, 245, 245);
+}
+.table-row__cell {
+  flex: 1;
+  margin-left: 5px;
+}
+.table-row:last-child {
+  border-bottom: none;
 }
