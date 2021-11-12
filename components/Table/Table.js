@@ -1,8 +1,8 @@
 export class Table {
   columnsConfig = null;
   tableContainer = null;
-  tbody = null;
-  thead = null;
+  tableBody = null;
+  tableHeader = null;
 
   constructor(columnsConfig, tableContainer) {
     this.columnsConfig = columnsConfig;
@@ -10,27 +10,27 @@ export class Table {
   }
 
   createTable() {
-    this.thead = document.createElement("div");
-    this.thead.classList.add("table-header");
-    this.tableContainer.append(this.thead);
+    this.tableHeader = document.createElement("div");
+    this.tableHeader.classList.add("table-header");
+    this.tableContainer.append(this.tableHeader);
 
-    this.tbody = document.createElement("div");
-    this.tbody.classList.add("table-body");
-    this.tableContainer.append(this.tbody);
+    this.tableBody = document.createElement("div");
+    this.tableBody.classList.add("table-body");
+    this.tableContainer.append(this.tableBody);
 
     this.createHeader();
   }
 
   createHeader() {
-    const tr = document.createElement("div");
-    tr.classList.add("table-header-row");
+    const tableHeaderRow = document.createElement("div");
+    tableHeaderRow.classList.add("table-header-row");
 
     const cells = this.columnsConfig.map((col) => {
       const cell = document.createElement("div");
       cell.classList.add("table-header__cell");
 
-      const btnContainer = document.createElement("div");
-      btnContainer.classList.add("btn-container");
+      const actionsContainer = document.createElement("div");
+      actionsContainer.classList.add("actions-container");
 
       const arrowBtn = document.createElement("span");
       arrowBtn.classList.add("material-icons");
@@ -40,13 +40,13 @@ export class Table {
       menuBtn.classList.add("material-icons");
       menuBtn.textContent = "more_vert";
 
-      btnContainer.append(arrowBtn, menuBtn);
+      actionsContainer.append(arrowBtn, menuBtn);
       cell.textContent = col.label;
-      cell.append(btnContainer);
+      cell.append(actionsContainer);
       return cell;
     });
-    tr.append(...cells);
-    this.thead.append(tr);
+    tableHeaderRow.append(...cells);
+    this.tableHeader.append(tableHeaderRow);
   }
 
   render(data) {
@@ -65,6 +65,6 @@ export class Table {
       fragment.appendChild(rowElement);
     });
 
-    this.tbody.appendChild(fragment);
+    this.tableBody.appendChild(fragment);
   }
 }
