@@ -9,7 +9,12 @@ const tableContainer = document.getElementById('table');
 const countriesTable = new Table(
   countriesTableColumnsConfig,
   tableContainer,
-  quickSort
+  function tableFunc(dataKey, isAsc) {
+    isAsc
+      ? this.render(quickSort(countries, dataKey))
+      : this.render(quickSort(countries, dataKey).reverse());
+  }
 );
-countriesTable.createTable(countries);
+
+countriesTable.createTable();
 countriesTable.render(countries);

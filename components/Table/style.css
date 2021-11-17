@@ -4,7 +4,7 @@
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 2px;
-  font-family: "Roboto";
+  font-family: 'Roboto';
 }
 .table-header {
   display: flex;
@@ -41,6 +41,13 @@
   font-size: 19px;
   display: block;
 }
+.table-header__cell[data-sortable='false']:hover .material-icons[name='arrow'] {
+  display: none;
+}
+.table-header__cell[data-sortable='false']:hover
+  .material-icons[name='menuBtn'] {
+  margin-left: auto;
+}
 .table-row {
   display: flex;
   border-bottom: 1px solid #ccc;
@@ -53,6 +60,15 @@
   flex: 1;
   padding-left: 10px;
 }
+.material-icons[name='arrow'][asc='true'] {
+  transform: rotate(180deg);
+}
+.material-icons[name='arrow'][asc='false'] {
+  transform: rotate(360deg);
+}
 .table-row:last-child {
   border-bottom: none;
+}
+.table-header-label {
+  cursor: pointer;
 }
