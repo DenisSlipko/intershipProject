@@ -7,9 +7,9 @@ export class Table {
   isOrderAsc = false;
 
   constructor(columnsConfig, tableContainer, callbackFunc) {
-    this.callbackFunc = callbackFunc;
     this.columnsConfig = columnsConfig;
     this.tableContainer = tableContainer;
+    this.callbackFunc = callbackFunc;
   }
 
   createTable() {
@@ -75,18 +75,6 @@ export class Table {
     });
     tableHeaderRow.append(...cells);
     this.tableHeader.append(tableHeaderRow);
-  }
-
-  filterMenu() {
-    const filterMenuContainer = document.createElement('div');
-    filterMenuContainer.classList.add('filter-menu-container');
-    const column = document.createElement('div');
-    column.classList.add('menu-column');
-    const columnLabel = document.createElement('div');
-    columnLabel.classList.add('column-label');
-
-    filterMenuContainer.append(column);
-    this.tableBody.append(filterMenuContainer);
   }
 
   clearTable() {
