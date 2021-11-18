@@ -1,15 +1,25 @@
 export class Table {
   columnsConfig = null;
+  menuConfig = null;
   tableContainer = null;
   tableBody = null;
   tableHeader = null;
-  callbackFunc = null;
-  isOrderAsc = false;
+  sortCallback = null;
+  isOrderAsc = null;
+  initialArrCallback = null;
 
-  constructor(columnsConfig, tableContainer, callbackFunc) {
+  constructor(
+    columnsConfig,
+    menuConfig,
+    tableContainer,
+    sortCallback,
+    initialArrCallback
+  ) {
     this.columnsConfig = columnsConfig;
+    this.menuConfig = menuConfig;
     this.tableContainer = tableContainer;
-    this.callbackFunc = callbackFunc;
+    this.sortCallback = sortCallback;
+    this.initialArrCallback = initialArrCallback;
   }
 
   createTable() {
@@ -33,43 +43,55 @@ export class Table {
       cell.classList.add('table-header__cell');
       cell.setAttribute('data-key', col.key);
       cell.setAttribute('data-sortable', col.sortable);
-      const headerLabel = document.createElement('div');
-      headerLabel.classList.add('table-header-label');
-
-      if (col.sortable) {
-        headerLabel.addEventListener('click', () => {
-          this.isOrderAsc = !this.isOrderAsc;
-          const dataKey = cell.getAttribute('data-key');
-          arrowBtn.setAttribute('asc', this.isOrderAsc);
-          this.callbackFunc(dataKey, this.isOrderAsc);
-        });
-      }
+      const headerSortBtn = document.createElement('div');
+      headerSortBtn.classList.add('header-sort-btn');
 
       const actionsContainer = document.createElement('div');
       actionsContainer.classList.add('actions-container');
 
       const arrowBtn = document.createElement('span');
       arrowBtn.classList.add('material-icons');
+      arrowBtn.classList.add('arrow');
       arrowBtn.textContent = 'south';
-      arrowBtn.setAttribute('name', 'arrow');
+
+      const arrayOfListener = [headerSortBtn, arrowBtn];
 
       if (col.sortable) {
-        arrowBtn.addEventListener('click', () => {
-          this.isOrderAsc = !this.isOrderAsc;
-          arrowBtn.setAttribute('asc', this.isOrderAsc);
-          const dataKey = cell.getAttribute('data-key');
-          this.callbackFunc(dataKey, this.isOrderAsc);
-        });
+        arrayOfListener.forEach((el) =>
+          el.addEventListener('click', () => {
+            const dataKey = cell.getAttribute('data-key');
+            console.log(this.isOrderAsc);
+            if (this.isOrderAsc === null) {
+              this.isOrderAsc = true;
+              console.log(this.isOrderAsc);
+              this.sortCallback(dataKey, this.isOrderAsc);
+              arrowBtn.setAttribute('asc', this.isOrderAsc);
+              return;
+            }
+            if (this.isOrderAsc === true) {
+              this.isOrderAsc = false;
+              console.log(this.isOrderAsc);
+              this.sortCallback(dataKey, this.isOrderAsc);
+              arrowBtn.setAttribute('asc', this.isOrderAsc);
+              return;
+            }
+            if (this.isOrderAsc === false) {
+              this.isOrderAsc = null;
+              console.log(this.isOrderAsc);
+              this.initialArrCallback();
+              return;
+            }
+          })
+        );
       }
-
       const menuBtn = document.createElement('span');
       menuBtn.classList.add('material-icons');
+      menuBtn.classList.add('menuBtn');
       menuBtn.textContent = 'more_vert';
-      menuBtn.setAttribute('name', 'menuBtn');
 
       actionsContainer.append(arrowBtn, menuBtn);
-      headerLabel.textContent = col.label;
-      cell.append(headerLabel);
+      headerSortBtn.textContent = col.label;
+      cell.append(headerSortBtn);
       cell.append(actionsContainer);
       return cell;
     });
@@ -91,7 +113,6 @@ export class Table {
         const cell = document.createElement('div');
         cell.classList.add('table-row__cell');
         cell.textContent = element[column.key];
-        cell.setAttribute('data-key', column.key);
 
         return cell;
       });

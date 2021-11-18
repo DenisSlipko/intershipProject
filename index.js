@@ -3,16 +3,21 @@ import { countriesTableColumnsConfig } from './dataStore/config.js';
 import { countries } from './dataStore/data.js';
 import { bubbleSort } from './utils/bubbleSort.js';
 import { quickSort } from './utils/quickSort.js';
+import { menuConfig } from './dataStore/menuConfig.js';
 
 const tableContainer = document.getElementById('table');
 
 const countriesTable = new Table(
   countriesTableColumnsConfig,
+  menuConfig,
   tableContainer,
-  function tableFunc(dataKey, isAsc) {
+  (dataKey, isAsc) => {
     isAsc
-      ? this.render(quickSort(countries, dataKey))
-      : this.render(quickSort(countries, dataKey).reverse());
+      ? countriesTable.render(quickSort(countries, dataKey))
+      : countriesTable.render(quickSort(countries, dataKey).reverse());
+  },
+  () => {
+    countriesTable.render(countries);
   }
 );
 
