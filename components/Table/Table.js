@@ -60,24 +60,20 @@ export class Table {
         arrayOfListener.forEach((el) =>
           el.addEventListener('click', () => {
             const dataKey = cell.getAttribute('data-key');
-            console.log(this.isOrderAsc);
             if (this.isOrderAsc === null) {
               this.isOrderAsc = true;
-              console.log(this.isOrderAsc);
               this.sortCallback(dataKey, this.isOrderAsc);
               arrowBtn.setAttribute('asc', this.isOrderAsc);
               return;
             }
             if (this.isOrderAsc === true) {
               this.isOrderAsc = false;
-              console.log(this.isOrderAsc);
               this.sortCallback(dataKey, this.isOrderAsc);
               arrowBtn.setAttribute('asc', this.isOrderAsc);
               return;
             }
             if (this.isOrderAsc === false) {
               this.isOrderAsc = null;
-              console.log(this.isOrderAsc);
               this.initialArrCallback();
               return;
             }
