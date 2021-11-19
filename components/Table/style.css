@@ -42,10 +42,7 @@
   font-size: 19px;
   display: block;
 }
-.table-header__cell[data-sortable='false']:hover .arrow {
-  display: none;
-}
-.table-header__cell[data-sortable='false']:hover .menuBtn {
+.menuBtn {
   margin-left: auto;
 }
 .table-row {
@@ -71,4 +68,82 @@
 }
 .header-sort-btn {
   cursor: pointer;
+}
+/* Menu styles */
+.drop-down__menu {
+  display: none;
+  font-family: 'Roboto';
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  overflow: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.menu-item {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+.menu-item:hover {
+  background-color: #ddd;
+}
+.show {
+  display: block;
+}
+.filter-menu-container {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  justify-content: space-between;
+  background-color: #f1f1f1;
+  padding: 30px 20px;
+  min-width: 500px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  top: 100px;
+}
+.filter-value {
+  padding: 5px;
+  border: 1px solid #ccc;
+}
+.filter-value::placeholder {
+  font-size: 14px;
+}
+.btn-clean {
+  cursor: pointer;
+}
+.btn-exit {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+}
+/* Pagination styles */
+.pagination-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.dropdown-pagintaion-container {
+  height: 20px;
+  width: 20px;
+  display: flex;
+  flex-direction: row;
+}
+.drop-pag-item {
+  /* display: none; */
+  display: block;
+  margin-left: 3px;
+  border: 1px solid #ccc;
+}
+.page-num-container {
+  display: flex;
+  flex-direction: row;
+  margin-right: 20px;
+}
+.page-number {
+  display: block;
+  margin-left: 5px;
+  border: 1px solid #ccc;
 }

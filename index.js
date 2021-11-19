@@ -12,14 +12,18 @@ const countriesTable = new Table(
   menuConfig,
   tableContainer,
   (dataKey, isAsc) => {
+    const isDataKey = Boolean(dataKey);
+    if (!isDataKey) {
+      return countriesTable.render(countries);
+    }
     isAsc
       ? countriesTable.render(quickSort(countries, dataKey))
       : countriesTable.render(quickSort(countries, dataKey).reverse());
   },
   () => {
-    countriesTable.render(countries);
+    return countries;
   }
 );
-
+//console.log(countries);
 countriesTable.createTable();
 countriesTable.render(countries);
