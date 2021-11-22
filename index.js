@@ -6,12 +6,10 @@ import { quickSort } from './utils/quickSort.js';
 import { menuConfig } from './dataStore/menuConfig.js';
 
 const tableContainer = document.getElementById('table');
+const TOTAL_AMOUNT = 40;
 
-const countriesTable = new Table(
-  countriesTableColumnsConfig,
-  menuConfig,
-  tableContainer,
-  (dataKey, isAsc) => {
+const callbacksObject = {
+  sortCallback: (dataKey, isAsc) => {
     const isDataKey = Boolean(dataKey);
     if (!isDataKey) {
       return countriesTable.render(countries);
@@ -20,10 +18,30 @@ const countriesTable = new Table(
       ? countriesTable.render(quickSort(countries, dataKey))
       : countriesTable.render(quickSort(countries, dataKey).reverse());
   },
-  () => {
-    return countries;
-  }
+  paginationCallback: (currentPage, amount) => {
+    let start = (currentPage - 1) * amount;
+    let end = start + amount;
+    let notes = countries.slice(start, end);
+
+    countriesTable.render(notes);
+  },
+  filterCallback: (filter) => {
+    let sortedArr = [];
+    countries.forEach((country) => {
+      if (country['name'].toLowerCase().indexOf(filter) > -1) {
+        sortedArr.push(country);
+      }
+    });
+    countriesTable.render(sortedArr);
+  },
+};
+const countriesTable = new Table(
+  countriesTableColumnsConfig,
+  menuConfig,
+  tableContainer,
+  callbacksObject
 );
-//console.log(countries);
+
 countriesTable.createTable();
+countriesTable.createPagination(TOTAL_AMOUNT);
 countriesTable.render(countries);

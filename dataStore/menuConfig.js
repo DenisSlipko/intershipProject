@@ -5,11 +5,11 @@ export const menuConfig = [
   },
   {
     label: 'Sort by ASC',
-    key: 'sortbyasc',
+    key: 'sortByAsc',
   },
   {
     label: 'Sort by DESC',
-    key: 'sortbydesc',
+    key: 'sortByDesc',
   },
   {
     label: 'Filter',

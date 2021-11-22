@@ -1,35 +1,31 @@
+const PaginationConfigList = [
+  { pageSize: '20' },
+  { pageSize: '50' },
+  { pageSize: '100' },
+];
+
 export class Table {
   columnsConfig = null;
   menuConfig = null;
   tableContainer = null;
   tableBody = null;
   tableHeader = null;
-  sortCallback = null;
   isOrderAsc = null;
-  PaginationConfig = [
-    { pageSize: '10' },
-    { pageSize: '20' },
-    { pageSize: '50' },
-    { pageSize: '100' },
-  ];
-  paginationCallback = null;
-  initialSizePagination = 20;
-  numberOfPage = null;
-  selectPageNumber = 1;
-  tableElementsMap = {};
 
-  constructor(
-    columnsConfig,
-    menuConfig,
-    tableContainer,
-    sortCallback,
-    paginationCallback
-  ) {
+  PaginationConfigList = PaginationConfigList;
+  callbacksMap = {
+    sortCallback: null,
+    pagintaionCallback: null,
+    filterCallback: null,
+  };
+  tableElementsMap = {};
+  amount = this.PaginationConfigList[0].pageSize;
+
+  constructor(columnsConfig, menuConfig, tableContainer, callbacksMap) {
     this.columnsConfig = columnsConfig;
     this.menuConfig = menuConfig;
     this.tableContainer = tableContainer;
-    this.sortCallback = sortCallback;
-    this.paginationCallback = paginationCallback;
+    this.callbacksMap = callbacksMap;
   }
 
   createTable() {
@@ -42,7 +38,6 @@ export class Table {
     this.tableContainer.append(this.tableBody);
 
     this.createHeader();
-    this.createPagination();
   }
 
   createHeader() {
@@ -53,7 +48,7 @@ export class Table {
       const cell = document.createElement('div');
       cell.classList.add('table-header__cell');
       cell.setAttribute('data-key', col.key);
-      //cell.setAttribute('data-sortable', col.sortable);
+
       const headerSortBtn = document.createElement('div');
       headerSortBtn.classList.add('header-sort-btn');
 
@@ -71,22 +66,18 @@ export class Table {
         arrayOfListener.forEach((el) =>
           el.addEventListener('click', () => {
             const dataKey = cell.getAttribute('data-key');
+
             if (this.isOrderAsc === null) {
               this.isOrderAsc = true;
-              this.sortCallback(dataKey, this.isOrderAsc);
-              arrowBtn.setAttribute('asc', this.isOrderAsc);
-              return;
-            }
-            if (this.isOrderAsc === true) {
+              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
+              arrowBtn.setAttribute('data-asc', this.isOrderAsc);
+            } else if (this.isOrderAsc === true) {
               this.isOrderAsc = false;
-              this.sortCallback(dataKey, this.isOrderAsc);
-              arrowBtn.setAttribute('asc', this.isOrderAsc);
-              return;
-            }
-            if (this.isOrderAsc === false) {
+              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
+              arrowBtn.setAttribute('data-asc', this.isOrderAsc);
+            } else {
               this.isOrderAsc = null;
-              this.sortCallback();
-              return;
+              this.callbacksMap.sortCallback();
             }
           })
         );
@@ -98,46 +89,45 @@ export class Table {
 
       const dropDownMenu = document.createElement('div');
       dropDownMenu.classList.add('drop-down__menu');
-      const menuItems = this.menuConfig.map((item) => {
+      const menuItems = this.menuConfig.map((menuElement) => {
         const menuItem = document.createElement('a');
         menuItem.classList.add('menu-item');
-        menuItem.textContent = item.label;
+        menuItem.textContent = menuElement.label;
 
         if (!col.sortable) {
-          if (item.key === 'sortbyasc') {
+          if (menuElement.key === 'sortByAsc') {
             menuItem.style.display = 'none';
           }
-          if (item.key === 'sortbydesc') {
+          if (menuElement.key === 'sortByDesc') {
             menuItem.style.display = 'none';
           }
         }
 
-        menuItem.addEventListener('click', (e) => {
+        menuItem.addEventListener('click', () => {
           const dataKey = cell.getAttribute('data-key');
 
-          switch (item.key) {
+          switch (menuElement.key) {
             case 'unsort':
-              this.sortCallback();
+              this.callbacksMap.sortCallback();
               break;
-            case 'sortbyasc':
+            case 'sortByAsc':
               this.isOrderAsc = true;
-              this.sortCallback(dataKey, this.isOrderAsc);
+              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
               break;
-            case 'sortbydesc':
+            case 'sortByDesc':
               this.isOrderAsc = false;
-              this.sortCallback(dataKey, this.isOrderAsc);
+              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
               break;
             case 'filter':
-              this.filterMenu();
+              this.createFilterMenu();
               break;
             case 'hide':
               cell.style.display = 'none';
-              for (let key in this.tableElementsMap) {
-                if (key === dataKey) {
-                  this.tableElementsMap[key].forEach(
-                    (item) => (item.style.display = 'none')
-                  );
-                }
+              const dataElements = this.tableElementsMap[dataKey];
+              if (dataElements) {
+                this.tableElementsMap[dataKey].forEach(
+                  (item) => (item.style.display = 'none')
+                );
               }
               break;
           }
@@ -162,12 +152,12 @@ export class Table {
     this.tableHeader.append(tableHeaderRow);
   }
 
-  filterMenu() {
+  createFilterMenu() {
     const filterMenuContainer = document.createElement('div');
     filterMenuContainer.classList.add('filter-menu-container');
 
     const filterLabel = document.createElement('div');
-    filterLabel.classList.add('menu-label');
+    filterLabel.classList.add('filter-label');
     filterLabel.textContent = 'Name';
 
     const filterOperator = document.createElement('div');
@@ -187,28 +177,19 @@ export class Table {
     btnExit.textContent = 'x';
 
     btnExit.addEventListener('click', () => {
-      filterMenuContainer.style.display = 'none';
+      filterMenuContainer.parentElement.children[1].remove();
     });
 
     btnClean.addEventListener('click', () => {
       filterValue.value = '';
       document
         .querySelectorAll('.table-row')
-        .forEach((row) => (row.style.display = ''));
+        .forEach((row) => (row.style.display = 'flex'));
     });
 
     const filterFunction = (e) => {
-      this.paginationCallback();
       let filter = e.target.value;
-      for (let key in this.tableElementsMap) {
-        if (key === 'name') {
-          this.tableElementsMap[key].forEach((item) =>
-            item.innerHTML.toLowerCase().indexOf(filter) > -1
-              ? (item.parentElement.style.display = '')
-              : (item.parentElement.style.display = 'none')
-          );
-        }
-      }
+      this.callbacksMap.filterCallback(filter);
     };
 
     filterValue.addEventListener('input', filterFunction);
@@ -222,57 +203,50 @@ export class Table {
     );
     this.tableHeader.append(filterMenuContainer);
   }
-  createPagination() {
+
+  createPagination(TOTAL_AMOUNT = 0) {
     const pagintaionContainer = document.createElement('div');
     pagintaionContainer.classList.add('pagination-container');
 
-    const dropdownPagintaionContainer = document.createElement('ul');
-    dropdownPagintaionContainer.classList.add('dropdown-pagintaion-container');
+    const dropdownPagintaionContainer = document.createElement('select');
+    dropdownPagintaionContainer.classList.add('dropdown-pagination-container');
+
     const pageNumberContainer = document.createElement('ul');
     pageNumberContainer.classList.add('page-num-container');
 
     const renderPagesNumbers = () => {
-      this.numberOfPage = Math.ceil(
-        this.paginationCallback().length / this.initialSizePagination
-      );
+      const pages = Math.ceil(TOTAL_AMOUNT / this.amount);
 
-      for (let i = 1; i <= this.numberOfPage; i++) {
+      for (let i = 1; i <= pages; i++) {
         const pageNumberBtn = document.createElement('li');
         pageNumberBtn.classList.add('page-number');
         pageNumberBtn.textContent = i;
         pageNumberContainer.append(pageNumberBtn);
 
-        pageNumberBtn.addEventListener('click', (e) => {
-          this.selectPageNumber = +pageNumberBtn.innerHTML;
-          let start = (this.selectPageNumber - 1) * this.initialSizePagination;
-          let end = start + this.initialSizePagination;
-          let notes = this.paginationCallback().slice(start, end);
-
-          this.render(notes);
+        pageNumberBtn.addEventListener('click', () => {
+          const currentPage = +pageNumberBtn.innerHTML;
+          this.callbacksMap.paginationCallback(currentPage, this.amount);
         });
       }
     };
     renderPagesNumbers();
 
-    const dropdownPagintaionItems = this.PaginationConfig.map((item) => {
-      const dropPagItem = document.createElement('li');
+    const dropdownPagintaionItems = this.PaginationConfigList.map((item) => {
+      const dropPagItem = document.createElement('option');
       dropPagItem.classList.add('drop-pag-item');
       dropPagItem.textContent = item.pageSize;
 
-      dropdownPagintaionContainer.addEventListener('click', (e) => {
-        dropPagItem.style.display = 'block';
-
-        if (this.initialSizePagination !== +e.target.innerHTML) {
-          this.initialSizePagination = +e.target.innerHTML;
+      dropdownPagintaionContainer.addEventListener('change', (e) => {
+        if (this.amount !== +e.target.value) {
+          pageNumberContainer.innerHTML = '';
+          this.amount = +e.target.value;
           renderPagesNumbers();
+          this.callbacksMap.sortCallback();
         }
       });
 
       return dropPagItem;
     });
-
-    const pageSwitcher = document.createElement('div');
-    pageSwitcher.classList.add('page-switcher');
 
     dropdownPagintaionContainer.append(...dropdownPagintaionItems);
     pagintaionContainer.append(
@@ -289,7 +263,14 @@ export class Table {
   render(data) {
     this.clearTable();
     const fragment = new DocumentFragment();
-    let paginationData = data.slice(0, this.initialSizePagination);
+    let hidePagination = document.querySelector('.page-num-container');
+    let paginationData = data.slice(0, this.amount);
+    let dataLenght = Object.keys(paginationData).length;
+    if (dataLenght < this.amount) {
+      hidePagination.style.display = 'none';
+    } else {
+      hidePagination.style.display = 'flex';
+    }
     paginationData.forEach((element) => {
       const rowElement = document.createElement('div');
       rowElement.classList.add('table-row');
