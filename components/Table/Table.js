@@ -3,6 +3,14 @@ const PaginationConfigList = [
   { pageSize: '50' },
   { pageSize: '100' },
 ];
+const MenuElMap = {
+  UNSORT: 'unsort',
+  SORT_BY_ASC: 'sortByAsc',
+  SORT_BY_DESC: 'sortByDesc',
+  FILTER: 'filter',
+  HIDE: 'hide',
+};
+const DefaultAmountEl = PaginationConfigList[0].pageSize;
 
 export class Table {
   columnsConfig = null;
@@ -12,14 +20,18 @@ export class Table {
   tableHeader = null;
   isOrderAsc = null;
 
-  PaginationConfigList = PaginationConfigList;
+  paginationConfigList = PaginationConfigList;
   callbacksMap = {
     sortCallback: null,
     pagintaionCallback: null,
     filterCallback: null,
   };
   tableElementsMap = {};
-  amount = this.PaginationConfigList[0].pageSize;
+  menuElementsMap = [];
+  amountElOnPage = DefaultAmountEl;
+  pageNumberContainer = null;
+  menuElMap = MenuElMap;
+  menuDropDownItems = null;
 
   constructor(columnsConfig, menuConfig, tableContainer, callbacksMap) {
     this.columnsConfig = columnsConfig;
@@ -60,24 +72,31 @@ export class Table {
         arrowBtn.classList.add('material-icons');
         arrowBtn.classList.add('arrow');
         arrowBtn.textContent = 'south';
-        const arrayOfListener = [headerSortBtn, arrowBtn];
         actionsContainer.append(arrowBtn);
 
-        arrayOfListener.forEach((el) =>
+        const arrayOfActions = [headerSortBtn, arrowBtn];
+
+        arrayOfActions.forEach((el) =>
           el.addEventListener('click', () => {
             const dataKey = cell.getAttribute('data-key');
 
             if (this.isOrderAsc === null) {
-              this.isOrderAsc = true;
-              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
+              if (this.callbacksMap.sortCallback) {
+                this.isOrderAsc = true;
+                this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
+              }
               arrowBtn.setAttribute('data-asc', this.isOrderAsc);
             } else if (this.isOrderAsc === true) {
-              this.isOrderAsc = false;
-              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
+              if (this.callbacksMap.sortCallback) {
+                this.isOrderAsc = false;
+                this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
+              }
               arrowBtn.setAttribute('data-asc', this.isOrderAsc);
             } else {
-              this.isOrderAsc = null;
-              this.callbacksMap.sortCallback();
+              if (this.callbacksMap.sortCallback) {
+                this.isOrderAsc = null;
+                this.callbacksMap.sortCallback();
+              }
             }
           })
         );
@@ -87,60 +106,7 @@ export class Table {
       menuBtn.classList.add('menuBtn');
       menuBtn.textContent = 'more_vert';
 
-      const dropDownMenu = document.createElement('div');
-      dropDownMenu.classList.add('drop-down__menu');
-      const menuItems = this.menuConfig.map((menuElement) => {
-        const menuItem = document.createElement('a');
-        menuItem.classList.add('menu-item');
-        menuItem.textContent = menuElement.label;
-
-        if (!col.sortable) {
-          if (menuElement.key === 'sortByAsc') {
-            menuItem.style.display = 'none';
-          }
-          if (menuElement.key === 'sortByDesc') {
-            menuItem.style.display = 'none';
-          }
-        }
-
-        menuItem.addEventListener('click', () => {
-          const dataKey = cell.getAttribute('data-key');
-
-          switch (menuElement.key) {
-            case 'unsort':
-              this.callbacksMap.sortCallback();
-              break;
-            case 'sortByAsc':
-              this.isOrderAsc = true;
-              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
-              break;
-            case 'sortByDesc':
-              this.isOrderAsc = false;
-              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
-              break;
-            case 'filter':
-              this.createFilterMenu();
-              break;
-            case 'hide':
-              cell.style.display = 'none';
-              const dataElements = this.tableElementsMap[dataKey];
-              if (dataElements) {
-                this.tableElementsMap[dataKey].forEach(
-                  (item) => (item.style.display = 'none')
-                );
-              }
-              break;
-          }
-        });
-
-        return menuItem;
-      });
-      dropDownMenu.append(...menuItems);
-      menuBtn.append(dropDownMenu);
-
-      menuBtn.addEventListener('click', () => {
-        dropDownMenu.classList.toggle('show');
-      });
+      this.renderDropDownMenu(menuBtn, col, cell);
 
       actionsContainer.append(menuBtn);
       headerSortBtn.textContent = col.label;
@@ -150,6 +116,67 @@ export class Table {
     });
     tableHeaderRow.append(...cells);
     this.tableHeader.append(tableHeaderRow);
+  }
+
+  renderDropDownMenu(menuBtn, col, cell) {
+    const dropDownMenu = document.createElement('div');
+    dropDownMenu.classList.add('drop-down__menu');
+    this.menuDropDownItems = this.menuConfig.map((menuElement) => {
+      if (!col.sortable) {
+        if (menuElement.key === this.menuElMap.SORT_BY_ASC) {
+          return (this.menuDropDownItems.innerHTML = '');
+        }
+        if (menuElement.key === this.menuElMap.SORT_BY_DESC) {
+          return (this.menuDropDownItems.innerHTML = '');
+        }
+      }
+      const menuItem = document.createElement('a');
+      menuItem.classList.add('menu-item');
+      menuItem.textContent = menuElement.label;
+
+      menuItem.addEventListener('click', () => {
+        const dataKey = cell.getAttribute('data-key');
+        switch (menuElement.key) {
+          case this.menuElMap.UNSORT:
+            if (this.callbacksMap.sortCallback) {
+              this.callbacksMap.sortCallback();
+            }
+            break;
+          case this.menuElMap.SORT_BY_ASC:
+            if (this.callbacksMap.sortCallback) {
+              this.isOrderAsc = true;
+              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
+            }
+            break;
+          case this.menuElMap.SORT_BY_DESC:
+            if (this.callbacksMap.sortCallback) {
+              this.isOrderAsc = false;
+              this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
+            }
+            break;
+          case this.menuElMap.FILTER:
+            this.createFilterMenu();
+            break;
+          case this.menuElMap.HIDE:
+            cell.style.display = 'none';
+            const dataElements = this.tableElementsMap[dataKey];
+            if (dataElements) {
+              this.tableElementsMap[dataKey].forEach(
+                (item) => (item.style.display = 'none')
+              );
+            }
+            break;
+        }
+      });
+
+      return menuItem;
+    });
+    dropDownMenu.append(...this.menuDropDownItems);
+    menuBtn.append(dropDownMenu);
+
+    menuBtn.addEventListener('click', () => {
+      dropDownMenu.classList.toggle('show');
+    });
   }
 
   createFilterMenu() {
@@ -177,19 +204,21 @@ export class Table {
     btnExit.textContent = 'x';
 
     btnExit.addEventListener('click', () => {
-      filterMenuContainer.parentElement.children[1].remove();
+      filterMenuContainer.remove();
     });
 
     btnClean.addEventListener('click', () => {
       filterValue.value = '';
-      document
-        .querySelectorAll('.table-row')
-        .forEach((row) => (row.style.display = 'flex'));
+      if (this.callbacksMap.sortCallback) {
+        this.callbacksMap.sortCallback();
+      }
     });
 
     const filterFunction = (e) => {
       let filter = e.target.value;
-      this.callbacksMap.filterCallback(filter);
+      if (this.callbacksMap.filterCallback) {
+        this.callbacksMap.filterCallback(filter);
+      }
     };
 
     filterValue.addEventListener('input', filterFunction);
@@ -204,74 +233,73 @@ export class Table {
     this.tableHeader.append(filterMenuContainer);
   }
 
-  createPagination(TOTAL_AMOUNT = 0) {
-    const pagintaionContainer = document.createElement('div');
-    pagintaionContainer.classList.add('pagination-container');
+  createPagination(totalAmount = 0) {
+    const paginationContainer = document.createElement('div');
+    paginationContainer.classList.add('pagination-container');
 
     const dropdownPagintaionContainer = document.createElement('select');
     dropdownPagintaionContainer.classList.add('dropdown-pagination-container');
 
-    const pageNumberContainer = document.createElement('ul');
-    pageNumberContainer.classList.add('page-num-container');
+    this.pageNumberContainer = document.createElement('ul');
+    this.pageNumberContainer.classList.add('page-num-container');
 
-    const renderPagesNumbers = () => {
-      const pages = Math.ceil(TOTAL_AMOUNT / this.amount);
-
-      for (let i = 1; i <= pages; i++) {
-        const pageNumberBtn = document.createElement('li');
-        pageNumberBtn.classList.add('page-number');
-        pageNumberBtn.textContent = i;
-        pageNumberContainer.append(pageNumberBtn);
-
-        pageNumberBtn.addEventListener('click', () => {
-          const currentPage = +pageNumberBtn.innerHTML;
-          this.callbacksMap.paginationCallback(currentPage, this.amount);
-        });
-      }
-    };
-    renderPagesNumbers();
-
-    const dropdownPagintaionItems = this.PaginationConfigList.map((item) => {
+    const dropdownPaginationItems = this.paginationConfigList.map((item) => {
       const dropPagItem = document.createElement('option');
       dropPagItem.classList.add('drop-pag-item');
       dropPagItem.textContent = item.pageSize;
 
       dropdownPagintaionContainer.addEventListener('change', (e) => {
-        if (this.amount !== +e.target.value) {
-          pageNumberContainer.innerHTML = '';
-          this.amount = +e.target.value;
-          renderPagesNumbers();
-          this.callbacksMap.sortCallback();
+        if (this.amountElOnPage !== parseFloat(e.target.value)) {
+          this.amountElOnPage = parseFloat(e.target.value);
+          this.renderPagesAmount(totalAmount);
+          if (this.callbacksMap.paginationCallback) {
+            this.callbacksMap.paginationCallback();
+          }
         }
       });
 
       return dropPagItem;
     });
 
-    dropdownPagintaionContainer.append(...dropdownPagintaionItems);
-    pagintaionContainer.append(
+    dropdownPagintaionContainer.append(...dropdownPaginationItems);
+    paginationContainer.append(
       dropdownPagintaionContainer,
-      pageNumberContainer
+      this.pageNumberContainer
     );
-    this.tableContainer.append(pagintaionContainer);
+    this.tableContainer.append(paginationContainer);
+  }
+
+  renderPagesAmount(totalAmount = 0) {
+    const pages = Math.ceil(totalAmount / this.amountElOnPage);
+
+    for (let i = 1; i <= pages; i++) {
+      const pageNumberBtn = document.createElement('li');
+      pageNumberBtn.classList.add('page-number');
+      pageNumberBtn.textContent = i;
+      this.pageNumberContainer.append(pageNumberBtn);
+
+      pageNumberBtn.addEventListener('click', () => {
+        const currentPage = +pageNumberBtn.innerHTML;
+        if (this.callbacksMap.paginationCallback) {
+          this.callbacksMap.paginationCallback(
+            currentPage,
+            this.amountElOnPage
+          );
+        }
+      });
+    }
   }
 
   clearTable() {
     this.tableBody.innerHTML = '';
+    this.pageNumberContainer.innerHTML = '';
   }
 
-  render(data) {
+  render(data, totalAmount) {
     this.clearTable();
+    this.renderPagesAmount(totalAmount);
     const fragment = new DocumentFragment();
-    let hidePagination = document.querySelector('.page-num-container');
-    let paginationData = data.slice(0, this.amount);
-    let dataLenght = Object.keys(paginationData).length;
-    if (dataLenght < this.amount) {
-      hidePagination.style.display = 'none';
-    } else {
-      hidePagination.style.display = 'flex';
-    }
-    paginationData.forEach((element) => {
+    data.forEach((element) => {
       const rowElement = document.createElement('div');
       rowElement.classList.add('table-row');
       const cells = this.columnsConfig.map((column) => {
@@ -284,7 +312,6 @@ export class Table {
         } else {
           this.tableElementsMap[column.key] = [cell];
         }
-
         return cell;
       });
       rowElement.append(...cells);

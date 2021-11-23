@@ -1,4 +1,4 @@
-export const quickSort = (array, key, isAsk) => {
+export const quickSort = (array, key) => {
   if (array.length < 2) {
     return array;
   } else {
