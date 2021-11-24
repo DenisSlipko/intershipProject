@@ -134,7 +134,6 @@
   flex-direction: row;
 }
 .drop-pag-item {
-  /* display: none; */
   display: block;
   margin-left: 3px;
   border: 1px solid #ccc;
