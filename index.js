@@ -33,10 +33,13 @@ const callbacksObject = {
 
     countriesTable.render(paginationData, totalAmount);
   },
-  filterCallback: (filter) => {
+  filterCallback: (filter, dataKey) => {
+    if ((filter == null, dataKey == null)) {
+      return countriesTable.render(countries, totalAmount);
+    }
     let sortedArr = countries.filter(
       (country) =>
-        country['name'].toLowerCase().indexOf(filter.toLowerCase()) > -1
+        country[dataKey].toLowerCase().indexOf(filter.toLowerCase()) > -1
     );
     countriesTable.render(sortedArr, sortedArr.length);
   },

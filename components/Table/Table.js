@@ -1,15 +1,10 @@
+import { MenuElMap } from '../../dataStore/menuConfig.js';
+
 const PaginationConfigList = [
   { pageSize: '20' },
   { pageSize: '50' },
   { pageSize: '100' },
 ];
-const MenuElMap = {
-  UNSORT: 'unsort',
-  SORT_BY_ASC: 'sortByAsc',
-  SORT_BY_DESC: 'sortByDesc',
-  FILTER: 'filter',
-  HIDE: 'hide',
-};
 const DefaultAmountEl = PaginationConfigList[0].pageSize;
 
 export class Table {
@@ -30,6 +25,7 @@ export class Table {
   pageNumberContainer = null;
   menuDropDownItems = null;
   menuItem = null;
+  tableHeaderRow = null;
 
   constructor(columnsConfig, menuConfig, tableContainer, callbacksMap) {
     this.columnsConfig = columnsConfig;
@@ -51,13 +47,14 @@ export class Table {
   }
 
   createHeader() {
-    const tableHeaderRow = document.createElement('div');
-    tableHeaderRow.classList.add('table-header-row');
+    this.tableHeaderRow = document.createElement('div');
+    this.tableHeaderRow.classList.add('table-header-row');
 
     const cells = this.columnsConfig.map((col) => {
       const cell = document.createElement('div');
       cell.classList.add('table-header__cell');
       cell.setAttribute('data-key', col.key);
+      const dataKey = col.key;
 
       const headerSortBtn = document.createElement('div');
       headerSortBtn.classList.add('header-sort-btn');
@@ -77,8 +74,6 @@ export class Table {
         if (this.callbacksMap.sortCallback) {
           arrayOfActions.forEach((el) =>
             el.addEventListener('click', () => {
-              const dataKey = cell.getAttribute('data-key');
-
               if (this.isOrderAsc === null) {
                 this.isOrderAsc = true;
                 this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
@@ -100,8 +95,8 @@ export class Table {
       menuBtn.classList.add('menuBtn');
       menuBtn.textContent = 'more_vert';
 
-      let isSortable = col.sortable;
-      this.renderDropDownMenu(menuBtn, isSortable, cell);
+      const isSortable = col.sortable;
+      this.renderDropDownMenu(menuBtn, isSortable, cell, dataKey);
 
       actionsContainer.append(menuBtn);
       headerSortBtn.textContent = col.label;
@@ -109,27 +104,19 @@ export class Table {
       cell.append(actionsContainer);
       return cell;
     });
-    tableHeaderRow.append(...cells);
-    this.tableHeader.append(tableHeaderRow);
+    this.tableHeaderRow.append(...cells);
+    this.tableHeader.append(this.tableHeaderRow);
   }
 
-  renderDropDownMenu(menuBtn, isSortable, cell) {
+  renderDropDownMenu(menuBtn, isSortable, cell, dataKey) {
     const dropDownMenu = document.createElement('div');
     dropDownMenu.classList.add('drop-down__menu');
     this.menuDropDownItems = this.menuConfig
       .filter((elConfig) => {
-        if (
-          this.callbacksMap.sortCallback ||
-          this.callbacksMap.filterCallback
-        ) {
-          const menuElSort =
-            elConfig.key === MenuElMap.SORT_BY_ASC ||
-            elConfig.key === MenuElMap.SORT_BY_DESC;
-          if (!isSortable && menuElSort) {
-            return;
-          }
-        }
-        return elConfig != null;
+        const isSortEl =
+          elConfig.key === MenuElMap.SORT_BY_ASC ||
+          elConfig.key === MenuElMap.SORT_BY_DESC;
+        return isSortEl ? isSortable && this.callbacksMap.sortCallback : true;
       })
       .map((menuElement) => {
         this.menuItem = document.createElement('a');
@@ -137,9 +124,9 @@ export class Table {
         this.menuItem.textContent = menuElement.label;
 
         this.menuItem.addEventListener('click', () => {
-          const dataKey = cell.getAttribute('data-key');
           switch (menuElement.key) {
             case MenuElMap.UNSORT:
+              this.isOrderAsc = null;
               this.callbacksMap.sortCallback();
               break;
             case MenuElMap.SORT_BY_ASC:
@@ -151,7 +138,7 @@ export class Table {
               this.callbacksMap.sortCallback(dataKey, this.isOrderAsc);
               break;
             case MenuElMap.FILTER:
-              this.createFilterMenu();
+              this.createFilterMenu(dataKey);
               break;
             case MenuElMap.HIDE:
               cell.style.display = 'none';
@@ -171,17 +158,20 @@ export class Table {
     menuBtn.append(dropDownMenu);
 
     menuBtn.addEventListener('click', () => {
-      dropDownMenu.classList.toggle('show');
+      dropDownMenu.style.display = 'block';
+    });
+    this.tableHeaderRow.addEventListener('mouseleave', () => {
+      dropDownMenu.style.display = 'none';
     });
   }
 
-  createFilterMenu() {
+  createFilterMenu(dataKey) {
     const filterMenuContainer = document.createElement('div');
     filterMenuContainer.classList.add('filter-menu-container');
 
     const filterLabel = document.createElement('div');
     filterLabel.classList.add('filter-label');
-    filterLabel.textContent = 'Name';
+    filterLabel.textContent = dataKey;
 
     const filterOperator = document.createElement('div');
     filterOperator.classList.add('filter-operator');
@@ -203,18 +193,16 @@ export class Table {
       filterMenuContainer.remove();
     });
 
-    if (this.callbacksMap.sortCallback) {
+    if (this.callbacksMap.filterCallback) {
       btnClean.addEventListener('click', () => {
         filterValue.value = '';
-        this.callbacksMap.sortCallback();
+        this.callbacksMap.filterCallback();
+      });
+      filterValue.addEventListener('input', (e) => {
+        let filter = e.target.value;
+        this.callbacksMap.filterCallback(filter, dataKey);
       });
     }
-
-    const filterFunction = (e) => {
-      let filter = e.target.value;
-      this.callbacksMap.filterCallback(filter);
-    };
-    filterValue.addEventListener('input', filterFunction);
 
     filterMenuContainer.append(
       btnClean,
@@ -243,8 +231,8 @@ export class Table {
 
       if (this.callbacksMap.paginationCallback) {
         dropdownPagintaionContainer.addEventListener('change', (e) => {
-          if (this.amountElOnPage !== parseFloat(e.target.value)) {
-            this.amountElOnPage = parseFloat(e.target.value);
+          if (this.amountElOnPage !== parseInt(e.target.value)) {
+            this.amountElOnPage = parseInt(e.target.value);
             this.renderPagesAmount(totalAmount);
             this.callbacksMap.paginationCallback();
           }
@@ -273,7 +261,7 @@ export class Table {
 
       if (this.callbacksMap.paginationCallback) {
         pageNumberBtn.addEventListener('click', () => {
-          const currentPage = +pageNumberBtn.innerHTML;
+          const currentPage = i;
           this.callbacksMap.paginationCallback(
             currentPage,
             this.amountElOnPage

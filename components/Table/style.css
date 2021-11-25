@@ -90,9 +90,7 @@
 .menu-item:hover {
   background-color: #ddd;
 }
-.show {
-  display: block;
-}
+
 .filter-menu-container {
   display: flex;
   align-items: center;
