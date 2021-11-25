@@ -231,8 +231,8 @@ export class Table {
 
       if (this.callbacksMap.paginationCallback) {
         dropdownPagintaionContainer.addEventListener('change', (e) => {
-          if (this.amountElOnPage !== parseInt(e.target.value)) {
-            this.amountElOnPage = parseInt(e.target.value);
+          if (this.amountElOnPage !== parseInt(e.target.value, 10)) {
+            this.amountElOnPage = parseInt(e.target.value, 10);
             this.renderPagesAmount(totalAmount);
             this.callbacksMap.paginationCallback();
           }
