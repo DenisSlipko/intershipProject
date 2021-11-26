@@ -1,4 +1,5 @@
 import { MenuElMap } from '../../dataStore/menuConfig.js';
+import { Modal } from '../Modal.js';
 
 const PaginationConfigList = [
   { pageSize: '20' },
@@ -26,6 +27,7 @@ export class Table {
   menuDropDownItems = null;
   menuItem = null;
   tableHeaderRow = null;
+  dataFromServer = [];
 
   constructor(columnsConfig, menuConfig, tableContainer, callbacksMap) {
     this.columnsConfig = columnsConfig;
@@ -44,6 +46,7 @@ export class Table {
     this.tableContainer.append(this.tableBody);
 
     this.createHeader();
+    this.putDataToModal();
   }
 
   createHeader() {
@@ -271,6 +274,33 @@ export class Table {
     }
   }
 
+  renderModalWindow(matchObj, rowId) {
+    const modalWindowContainer = document.createElement('div');
+    modalWindowContainer.classList.add('modal-window-container');
+    const bgShadow = document.createElement('div');
+    bgShadow.classList.add('bg-shadow');
+    this.tableContainer.append(modalWindowContainer, bgShadow);
+    bgShadow.addEventListener('click', () => {
+      modalWindowContainer.remove();
+      bgShadow.remove();
+    });
+    const modalWindow = new Modal(modalWindowContainer);
+    modalWindow.createModal(matchObj, rowId);
+  }
+
+  putDataToModal() {
+    this.tableBody.addEventListener('click', (e) => {
+      if (e.target.getAttribute('data-id')) {
+        const rowId = parseInt(e.target.getAttribute('data-id'), 10);
+        const matchCountry = this.dataFromServer.find(
+          (el) => el['id'] === rowId
+        );
+        console.log(rowId);
+        this.renderModalWindow(matchCountry, rowId);
+      }
+    });
+  }
+
   clearTable() {
     this.tableBody.innerHTML = '';
     this.pageNumberContainer.innerHTML = '';
@@ -279,10 +309,12 @@ export class Table {
   render(data, totalAmount) {
     this.clearTable();
     this.renderPagesAmount(totalAmount);
+    this.dataFromServer = data;
     const fragment = new DocumentFragment();
     data.forEach((element) => {
       const rowElement = document.createElement('div');
       rowElement.classList.add('table-row');
+      rowElement.setAttribute('data-id', element.id); //
       const cells = this.columnsConfig.map((column) => {
         const cell = document.createElement('div');
         cell.classList.add('table-row__cell');
