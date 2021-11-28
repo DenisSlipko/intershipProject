@@ -20,13 +20,10 @@ const callbacksObject = {
     }
     isAsc
       ? countriesTable.render(quickSort(countries, dataKey), totalAmount)
-      : countriesTable.render(
-          quickSort(countries, dataKey).reverse(),
-          totalAmount
-        );
+      : countriesTable.render(quickSort(countries, dataKey).reverse(), totalAmount);
   },
   paginationCallback: (currentPage, amountEl) => {
-    if ((currentPage == null, amountEl == null)) {
+    if (!currentPage && !amountEl) {
       return countriesTable.render(countries, totalAmount);
     }
     let firstElOnPage = (currentPage - 1) * amountEl;
@@ -36,22 +33,14 @@ const callbacksObject = {
     countriesTable.render(paginationData, totalAmount);
   },
   filterCallback: (filter, dataKey) => {
-    if ((filter == null, dataKey == null)) {
+    if (!filter && !dataKey) {
       return countriesTable.render(countries, totalAmount);
     }
-    let sortedArr = countries.filter(
-      (country) =>
-        country[dataKey].toLowerCase().indexOf(filter.toLowerCase()) > -1
-    );
+    let sortedArr = countries.filter((country) => country[dataKey].toLowerCase().indexOf(filter.toLowerCase()) > -1);
     countriesTable.render(sortedArr, sortedArr.length);
   },
 };
-const countriesTable = new Table(
-  countriesTableColumnsConfig,
-  menuConfig,
-  tableContainer,
-  callbacksObject
-);
+const countriesTable = new Table(countriesTableColumnsConfig, menuConfig, tableContainer, callbacksObject);
 
 countriesTable.createTable();
 countriesTable.createPagination(countries, totalAmount);

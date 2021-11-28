@@ -1,31 +1,28 @@
-const countriesUrl = 'http://localhost:3000/countries';
+const RequestHeader = {
+  'Content-type': 'application/json; charset=UTF-8',
+};
 
 export const getData = async () => {
   try {
-    const response = await fetch(countriesUrl, {
+    const response = await fetch('http://localhost:3000/countries', {
       method: 'GET',
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
+      headers: RequestHeader,
     });
     const countries = await response.json();
     return countries;
   } catch (e) {
-    alert('Fail. Try again later!');
+    alert('Fail to get data from server. Try again later!');
   }
 };
 
 export const changeData = async (rowId, changedDataObj) => {
-  const url = `http://localhost:3000/countries/${rowId}`;
   try {
-    await fetch(url, {
+    await fetch(`http://localhost:3000/countries/${rowId}`, {
       method: 'PUT',
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
+      headers: RequestHeader,
       body: JSON.stringify(changedDataObj),
     });
   } catch (e) {
-    alert('Fail. Try again later!');
+    alert('Fail to put data to server. Try again later!');
   }
 };
