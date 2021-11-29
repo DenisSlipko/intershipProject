@@ -8,8 +8,7 @@ export const getData = async () => {
       method: 'GET',
       headers: RequestHeader,
     });
-    const countries = await response.json();
-    return countries;
+    return response.json();
   } catch (e) {
     alert('Fail to get data from server. Try again later!');
   }

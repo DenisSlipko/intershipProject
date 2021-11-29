@@ -1,31 +1,28 @@
 import { changeData } from '../api/requests.js';
 
 export class Modal {
-  tableContainer = null;
   modalWindowContainer = null;
   bgShadow = null;
+  changedDataObj = {};
 
-  constructor(tableContainer) {
-    this.tableContainer = tableContainer;
-  }
+  constructor() {}
 
-  renderModal(desiredObject, rowId) {
+  renderModal(targetObject, rowId) {
     this.modalWindowContainer = document.createElement('div');
     this.modalWindowContainer.classList.add('modal-window-container');
     this.bgShadow = document.createElement('div');
     this.bgShadow.classList.add('bg-shadow');
-    this.tableContainer.append(this.modalWindowContainer, this.bgShadow);
+    document.body.append(this.modalWindowContainer, this.bgShadow);
     this.bgShadow.addEventListener('click', () => {
       this.remove();
     });
-    let changedDataObj = {};
-    this.renderInputFields(desiredObject, changedDataObj);
+    this.renderInputFields(targetObject, this.changedDataObj);
     const changeDataBtn = document.createElement('button');
     changeDataBtn.classList.add('change-data-btn');
     changeDataBtn.innerText = 'CHANGE DATA';
 
     changeDataBtn.addEventListener('click', () => {
-      changeData(rowId, changedDataObj);
+      changeData(rowId, this.changedDataObj);
       this.remove();
     });
 
@@ -37,17 +34,17 @@ export class Modal {
     this.bgShadow.remove();
   }
 
-  renderInputFields(desiredObject, changedDataObj) {
-    for (let key in desiredObject) {
+  renderInputFields(targetObject) {
+    for (let key in targetObject) {
       if (key !== 'id') {
         const inputField = document.createElement('input');
         inputField.classList.add('modal-input-flied');
         inputField.placeholder = key;
-        inputField.value = desiredObject[key];
-        changedDataObj[key] = inputField.value;
+        inputField.value = targetObject[key];
+        this.changedDataObj[key] = inputField.value;
 
-        inputField.addEventListener('input', () => {
-          changedDataObj[key] = inputField.value;
+        inputField.addEventListener('input', (e) => {
+          this.changedDataObj[key] = e.target.value;
         });
         this.modalWindowContainer.append(inputField);
       }

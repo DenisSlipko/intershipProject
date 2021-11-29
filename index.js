@@ -9,8 +9,8 @@ const tableContainer = document.getElementById('table');
 
 const countries = await getData();
 
-let countriesLenght = Object.keys(countries).length;
-let totalAmount = countriesLenght;
+const countriesLenght = Object.keys(countries).length;
+const totalAmount = countriesLenght;
 
 const callbacksObject = {
   sortCallback: (dataKey, isAsc) => {
@@ -36,7 +36,7 @@ const callbacksObject = {
     if (!filter && !dataKey) {
       return countriesTable.render(countries, totalAmount);
     }
-    let sortedArr = countries.filter((country) => country[dataKey].toLowerCase().indexOf(filter.toLowerCase()) > -1);
+    const sortedArr = countries.filter((country) => country[dataKey].toLowerCase().indexOf(filter.toLowerCase()) > -1);
     countriesTable.render(sortedArr, sortedArr.length);
   },
 };
