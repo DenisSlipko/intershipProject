@@ -4,7 +4,7 @@ const RequestHeader = {
 
 export const getData = async () => {
   try {
-    const response = await fetch('http://localhost:3000/countries', {
+    const response = await fetch('http://localhost:4000/countries', {
       method: 'GET',
       headers: RequestHeader,
     });
@@ -16,7 +16,7 @@ export const getData = async () => {
 
 export const changeData = async (rowId, changedDataObj) => {
   try {
-    await fetch(`http://localhost:3000/countries/${rowId}`, {
+    await fetch(`http://localhost:4000/countries/${rowId}`, {
       method: 'PUT',
       headers: RequestHeader,
       body: JSON.stringify(changedDataObj),

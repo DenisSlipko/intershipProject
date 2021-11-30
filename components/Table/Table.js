@@ -42,7 +42,7 @@ export class Table {
     this.tableContainer.append(this.tableBody);
 
     this.createHeader();
-    this.modalListener();
+    this.bodyListener();
   }
 
   createHeader() {
