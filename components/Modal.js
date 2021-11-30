@@ -5,8 +5,6 @@ export class Modal {
   bgShadow = null;
   changedDataObj = {};
 
-  constructor() {}
-
   renderModal(targetObject, rowId) {
     this.modalWindowContainer = document.createElement('div');
     this.modalWindowContainer.classList.add('modal-window-container');
@@ -16,7 +14,7 @@ export class Modal {
     this.bgShadow.addEventListener('click', () => {
       this.remove();
     });
-    this.renderInputFields(targetObject, this.changedDataObj);
+    this.renderInputFields(targetObject);
     const changeDataBtn = document.createElement('button');
     changeDataBtn.classList.add('change-data-btn');
     changeDataBtn.innerText = 'CHANGE DATA';
@@ -46,6 +44,7 @@ export class Modal {
         inputField.addEventListener('input', (e) => {
           this.changedDataObj[key] = e.target.value;
         });
+
         this.modalWindowContainer.append(inputField);
       }
     }

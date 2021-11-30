@@ -259,11 +259,11 @@ export class Table {
     modalWindow.renderModal(targetObject, rowId);
   }
 
-  modalListener() {
+  bodyListener() {
     this.tableBody.addEventListener('click', (e) => {
       if (e.target.getAttribute('data-id')) {
         const rowId = parseInt(e.target.getAttribute('data-id'), 10);
-        const targetObject = this.saveServerData.find(({ id } = el) => id === rowId);
+        const targetObject = this.saveServerData.find(({ id }) => id === rowId);
         this.createModalWindow(targetObject, rowId);
       }
     });
