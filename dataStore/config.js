@@ -6,12 +6,12 @@ export const countriesTableColumnsConfig = [
   },
   {
     label: 'Iso',
-    key: 'iso',
+    key: 'iso3',
     sortable: true,
   },
   {
     label: 'Phone сode',
-    key: 'phoneCode',
+    key: 'phone_code',
     sortable: false,
   },
   {

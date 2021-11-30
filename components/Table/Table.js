@@ -1,10 +1,7 @@
 import { MenuElMap } from '../../dataStore/menuConfig.js';
+import { Modal } from '../Modal.js';
 
-const PaginationConfigList = [
-  { pageSize: '20' },
-  { pageSize: '50' },
-  { pageSize: '100' },
-];
+const PaginationConfigList = [{ pageSize: '20' }, { pageSize: '50' }, { pageSize: '100' }];
 const DefaultAmountEl = PaginationConfigList[0].pageSize;
 
 export class Table {
@@ -26,6 +23,7 @@ export class Table {
   menuDropDownItems = null;
   menuItem = null;
   tableHeaderRow = null;
+  saveServerData = [];
 
   constructor(columnsConfig, menuConfig, tableContainer, callbacksMap) {
     this.columnsConfig = columnsConfig;
@@ -44,6 +42,7 @@ export class Table {
     this.tableContainer.append(this.tableBody);
 
     this.createHeader();
+    this.bodyListener();
   }
 
   createHeader() {
@@ -113,9 +112,7 @@ export class Table {
     dropDownMenu.classList.add('drop-down__menu');
     this.menuDropDownItems = this.menuConfig
       .filter((elConfig) => {
-        const isSortEl =
-          elConfig.key === MenuElMap.SORT_BY_ASC ||
-          elConfig.key === MenuElMap.SORT_BY_DESC;
+        const isSortEl = elConfig.key === MenuElMap.SORT_BY_ASC || elConfig.key === MenuElMap.SORT_BY_DESC;
         return isSortEl ? isSortable && this.callbacksMap.sortCallback : true;
       })
       .map((menuElement) => {
@@ -144,9 +141,7 @@ export class Table {
               cell.style.display = 'none';
               const dataElements = this.tableElementsMap[dataKey];
               if (dataElements) {
-                this.tableElementsMap[dataKey].forEach(
-                  (item) => (item.style.display = 'none')
-                );
+                this.tableElementsMap[dataKey].forEach((item) => (item.style.display = 'none'));
               }
               break;
           }
@@ -204,13 +199,7 @@ export class Table {
       });
     }
 
-    filterMenuContainer.append(
-      btnClean,
-      filterLabel,
-      filterOperator,
-      filterValue,
-      btnExit
-    );
+    filterMenuContainer.append(btnClean, filterLabel, filterOperator, filterValue, btnExit);
     this.tableHeader.append(filterMenuContainer);
   }
 
@@ -243,10 +232,7 @@ export class Table {
     });
 
     dropdownPagintaionContainer.append(...dropdownPaginationItems);
-    paginationContainer.append(
-      dropdownPagintaionContainer,
-      this.pageNumberContainer
-    );
+    paginationContainer.append(dropdownPagintaionContainer, this.pageNumberContainer);
     this.tableContainer.append(paginationContainer);
   }
 
@@ -262,13 +248,25 @@ export class Table {
       if (this.callbacksMap.paginationCallback) {
         pageNumberBtn.addEventListener('click', () => {
           const currentPage = i;
-          this.callbacksMap.paginationCallback(
-            currentPage,
-            this.amountElOnPage
-          );
+          this.callbacksMap.paginationCallback(currentPage, this.amountElOnPage);
         });
       }
     }
+  }
+
+  createModalWindow(targetObject, rowId) {
+    const modalWindow = new Modal(this.tableContainer);
+    modalWindow.renderModal(targetObject, rowId);
+  }
+
+  bodyListener() {
+    this.tableBody.addEventListener('click', (e) => {
+      if (e.target.getAttribute('data-id')) {
+        const rowId = parseInt(e.target.getAttribute('data-id'), 10);
+        const targetObject = this.saveServerData.find(({ id }) => id === rowId);
+        this.createModalWindow(targetObject, rowId);
+      }
+    });
   }
 
   clearTable() {
@@ -279,10 +277,12 @@ export class Table {
   render(data, totalAmount) {
     this.clearTable();
     this.renderPagesAmount(totalAmount);
+    this.saveServerData = data;
     const fragment = new DocumentFragment();
     data.forEach((element) => {
       const rowElement = document.createElement('div');
       rowElement.classList.add('table-row');
+      rowElement.setAttribute('data-id', element.id);
       const cells = this.columnsConfig.map((column) => {
         const cell = document.createElement('div');
         cell.classList.add('table-row__cell');
