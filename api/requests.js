@@ -9,17 +9,16 @@ export const getData = async (elementsAmount, pageNumber, ascFlag, sortKey, filt
     _order: ascFlag,
     _sort: sortKey,
   });
+  filter ? params.append(`${sortKey}_like`, filter) : null;
   const url = `http://localhost:4000/countries?${params}`;
-  const urlСondition = filter ? url + `&${sortKey}_like=${filter}` : url;
   try {
-    const response = await fetch(urlСondition, {
+    const response = await fetch(url, {
       method: 'GET',
       headers: RequestHeader,
     });
     const amountCountries = response.headers.get('X-Total-Count');
     const data = await response.json();
-    const arrOfData = [data, amountCountries];
-    return arrOfData;
+    return [data, amountCountries];
   } catch (e) {
     alert('Fail to get data from server. Try again later!');
   }

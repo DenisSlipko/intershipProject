@@ -7,17 +7,16 @@ import { getData } from './api/requests.js';
 
 const tableContainer = document.getElementById('table');
 
-const firstPage = await getData(20, 1);
-const totalAmount = await getData();
+const [firstPage, totalAmount] = await getData(20, 1);
 
 const getDataCallback = async (amountEl, currentPage, isAsc, dataKey, filter) => {
   const ascFlag = isAsc ? 'asc' : 'desc';
-  const sortRequest = await getData(amountEl, currentPage, ascFlag, dataKey, filter);
-  countriesTable.render(sortRequest[0], totalAmount[1]);
+  const [dataRequest, amount] = await getData(amountEl, currentPage, ascFlag, dataKey, filter);
+  countriesTable.render(dataRequest, amount);
 };
 
 const countriesTable = new Table(countriesTableColumnsConfig, menuConfig, tableContainer, getDataCallback);
 
 countriesTable.createTable();
-countriesTable.createPagination(totalAmount[1]);
-countriesTable.render(firstPage[0], totalAmount[1]);
+countriesTable.createPagination(totalAmount);
+countriesTable.render(firstPage, totalAmount);
