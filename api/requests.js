@@ -9,7 +9,9 @@ export const getData = async (elementsAmount, pageNumber, ascFlag, sortKey, filt
     _order: ascFlag,
     _sort: sortKey,
   });
-  filter ? params.append(`${sortKey}_like`, filter) : null;
+  if (filter) {
+    params.append(`${sortKey}_like`, filter);
+  }
   const url = `http://localhost:4000/countries?${params}`;
   try {
     const response = await fetch(url, {
