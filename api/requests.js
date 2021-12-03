@@ -2,13 +2,25 @@ const RequestHeader = {
   'Content-type': 'application/json; charset=UTF-8',
 };
 
-export const getData = async () => {
+export const getData = async (elementsAmount, pageNumber, ascFlag, sortKey, filter) => {
+  const params = new URLSearchParams({
+    _limit: elementsAmount,
+    _page: pageNumber,
+    _order: ascFlag,
+    _sort: sortKey,
+  });
+  if (filter) {
+    params.append(`${sortKey}_like`, filter);
+  }
+  const url = `http://localhost:4000/countries?${params}`;
   try {
-    const response = await fetch('http://localhost:4000/countries', {
+    const response = await fetch(url, {
       method: 'GET',
       headers: RequestHeader,
     });
-    return response.json();
+    const amountCountries = response.headers.get('X-Total-Count');
+    const data = await response.json();
+    return [data, amountCountries];
   } catch (e) {
     alert('Fail to get data from server. Try again later!');
   }

@@ -7,41 +7,16 @@ import { getData } from './api/requests.js';
 
 const tableContainer = document.getElementById('table');
 
-const countries = await getData();
+const [firstPage, totalAmount] = await getData(20, 1);
 
-const countriesLenght = Object.keys(countries).length;
-const totalAmount = countriesLenght;
-
-const callbacksObject = {
-  sortCallback: (dataKey, isAsc) => {
-    const isDataKey = Boolean(dataKey);
-    if (!isDataKey) {
-      return countriesTable.render(countries, totalAmount);
-    }
-    isAsc
-      ? countriesTable.render(quickSort(countries, dataKey), totalAmount)
-      : countriesTable.render(quickSort(countries, dataKey).reverse(), totalAmount);
-  },
-  paginationCallback: (currentPage, amountEl) => {
-    if (!currentPage && !amountEl) {
-      return countriesTable.render(countries, totalAmount);
-    }
-    let firstElOnPage = (currentPage - 1) * amountEl;
-    let lastElOnPage = firstElOnPage + amountEl;
-    let paginationData = countries.slice(firstElOnPage, lastElOnPage);
-
-    countriesTable.render(paginationData, totalAmount);
-  },
-  filterCallback: (filter, dataKey) => {
-    if (!filter && !dataKey) {
-      return countriesTable.render(countries, totalAmount);
-    }
-    const sortedArr = countries.filter((country) => country[dataKey].toLowerCase().indexOf(filter.toLowerCase()) > -1);
-    countriesTable.render(sortedArr, sortedArr.length);
-  },
+const getDataCallback = async (amountEl, currentPage, isAsc, dataKey, filter) => {
+  const ascFlag = isAsc ? 'asc' : 'desc';
+  const [dataRequest, amount] = await getData(amountEl, currentPage, ascFlag, dataKey, filter);
+  countriesTable.render(dataRequest, amount);
 };
-const countriesTable = new Table(countriesTableColumnsConfig, menuConfig, tableContainer, callbacksObject);
+
+const countriesTable = new Table(countriesTableColumnsConfig, menuConfig, tableContainer, getDataCallback);
 
 countriesTable.createTable();
-countriesTable.createPagination(countries, totalAmount);
-countriesTable.render(countries, totalAmount);
+countriesTable.createPagination(totalAmount);
+countriesTable.render(firstPage, totalAmount);
